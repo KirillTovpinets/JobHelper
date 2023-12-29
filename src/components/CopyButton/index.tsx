@@ -1,8 +1,26 @@
 import { Button } from "@mui/material";
 
-function CopyButton({ text }: { text: string }) {
-  const handleClick = () => navigator.clipboard.writeText(text);
-  return <Button onClick={handleClick}>Copy</Button>;
+function CopyButton({
+  text,
+  isCopied,
+  setCopied,
+}: {
+  text: string;
+  isCopied: boolean;
+  setCopied: (value: string) => void;
+}) {
+  const handleClick = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(text);
+  };
+  return (
+    <Button
+      variant={!isCopied ? "outlined" : "contained"}
+      onClick={handleClick}
+    >
+      {isCopied ? "Copied" : "Copy"}
+    </Button>
+  );
 }
 
 export default CopyButton;
