@@ -6,9 +6,11 @@ function QuestionLayout({
   question,
   isCopied,
   setCopied,
+  keyNumber,
 }: {
   question: Question;
   isCopied: boolean;
+  keyNumber: number;
   setCopied: (value: string) => void;
 }) {
   return (
@@ -16,13 +18,15 @@ function QuestionLayout({
       <Card>
         <CardContent>
           <Typography variant="h5" component="div">
-            {question.title}
+            {question.title} #{keyNumber}
           </Typography>
-          <Typography variant="body2">{question.content}</Typography>
+          <Typography variant="body2">
+            {question.extendedContent?.markdown || question.content}
+          </Typography>
         </CardContent>
         <CardActions>
           <CopyButton
-            text={question.content}
+            text={question.extendedContent?.markdown || question.content || ""}
             isCopied={isCopied}
             setCopied={setCopied}
           />
