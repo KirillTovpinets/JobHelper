@@ -1,7 +1,8 @@
 import { Box, Button, Snackbar, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Question, fetchJobData } from "./apiClient";
+import CreateQuestionModal from "./CreateQuestionModal";
+import { Question, createQuestionQuery, fetchJobData } from "./apiClient";
 import QuestionLayout from "./components/Question";
 
 function App() {
@@ -110,8 +111,31 @@ function App() {
     setOpen(true);
   }, [successMessage]);
 
+  const handleCreateNew = () => {
+    setCreateQuestion(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setCreateQuestion(false);
+  };
+
+  const handleSubmit = (question: Question) => {
+    createQuestionQuery(question).then((data: Question) => {
+      setSuccessMessage("Question Is created");
+
+      setQuestions([...questions, data]);
+    });
+  };
+
+  const [createQuestion, setCreateQuestion] = useState(false);
+
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+      <CreateQuestionModal
+        open={createQuestion}
+        handleClose={handleCloseCreateModal}
+        submit={handleSubmit}
+      />
       <Snackbar
         open={open}
         autoHideDuration={6000}
@@ -136,6 +160,9 @@ function App() {
         </Button>
         <Button variant="contained" onClick={handleCopyCL}>
           Cover Letter
+        </Button>
+        <Button onClick={handleCreateNew} variant="outlined">
+          Add New
         </Button>
       </Box>
       {questions.map((item, index) => (

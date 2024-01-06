@@ -1,6 +1,7 @@
 import request, { gql } from "graphql-request";
 
 export interface Question {
+  id: number;
   title: string;
   content?: string;
   extendedContent?: {
@@ -19,6 +20,42 @@ interface QuestionsResponse {
     content: CoverLetterType;
   };
 }
+
+const GRAPHQL_URL =
+  "https://api-us-west-2.hygraph.com/v2/clajqe6np361801ukcmef3zt4/master";
+export const createQuestionQuery = async (data: Question) => {
+  const query = gql`
+    mutation createQuestion($data: QuestionCreateInput!) {
+      createQuestion(data: $data) {
+        id
+      }
+    }
+  `;
+
+  const response: { createQuestion: Question } = await request({
+    url: GRAPHQL_URL,
+    document: query,
+    variables: {
+      data,
+    },
+  });
+
+  const publishedResponse: { publishQuestion: Question } = await request({
+    url: GRAPHQL_URL,
+    document: gql`
+      mutation publishQuestion($id: ID) {
+        publishQuestion(where: { id: $id }) {
+          content
+          title
+        }
+      }
+    `,
+    variables: {
+      id: response.createQuestion.id,
+    },
+  });
+  return publishedResponse.publishQuestion;
+};
 
 export const fetchJobData = async (
   coverLetterType: keyof CoverLetterType = "markdown"
@@ -41,7 +78,7 @@ export const fetchJobData = async (
   `;
 
   const response = (await request({
-    url: "https://api-us-west-2.hygraph.com/v2/clajqe6np361801ukcmef3zt4/master",
+    url: GRAPHQL_URL,
     document: query,
     variables: {
       coverLetterWhere: {
